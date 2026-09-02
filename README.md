@@ -2,7 +2,13 @@
 
 A real-time messaging application built with Next.js, supporting one-on-one and group conversations, presence tracking, read receipts, and media sharing.
 
+![Architecture diagram](docs/architecture-diagram.png)
+
+<details>
+<summary>UI Preview</summary>
+
 ![Connectopia screenshot](https://github.com/subham07-t/connectopia-social-media-app/assets/82716446/24179125-98a9-4d24-b1e0-2cd192a994fa)
+</details>
 
 **Live demo:** https://connectopia-social-media-app.vercel.app/
 
@@ -64,14 +70,7 @@ flowchart TD
     UI -->|upload| Cloud
 ```
 
-<details>
-<summary>Hand-drawn version</summary>
-
-![Architecture diagram](docs/architecture-diagram.png)
-
-Editable source: [docs/architecture.excalidraw](docs/architecture.excalidraw) (open at [excalidraw.com](https://excalidraw.com)).
-
-</details>
+Editable source for the architecture diagram: [docs/architecture.excalidraw](docs/architecture.excalidraw) (open at [excalidraw.com](https://excalidraw.com)).
 
 Client components call REST endpoints and server actions under `app/api` and `app/actions`. Auth is handled by NextAuth with credentials and OAuth providers, backed by the Prisma adapter. Messages and conversation state are persisted in MongoDB via Prisma, while Pusher broadcasts events (new messages, presence, read receipts) to subscribed clients. Media uploads go directly to Cloudinary from the client.
 

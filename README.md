@@ -1,87 +1,135 @@
+# Connectopia
 
-# Welcome to Connectopia messenger app 👋
-![Screenshot 2023-11-06 220329](https://github.com/subham07-t/connectopia-social-media-app/assets/82716446/24179125-98a9-4d24-b1e0-2cd192a994fa)
+A real-time messaging application built with Next.js, supporting one-on-one and group conversations, presence tracking, read receipts, and media sharing.
 
-Introducing our real-time messaging and chat application, designed for seamless communication. 
+![Connectopia screenshot](https://github.com/subham07-t/connectopia-social-media-app/assets/82716446/24179125-98a9-4d24-b1e0-2cd192a994fa)
 
-Our app offers features like message notifications, sleek design with Tailwind, full responsiveness, multiple authentication options, file/image uploads, read receipts, user status tracking, group chats, message attachments, user profile customization, and more.
-
-Experience a robust and feature-rich messaging platform with us.
-
-
-### ✨ [Demo](https://connectopia-social-media-app.vercel.app)
-
-
-## Run Locally
-
-Clone the project
-
-```sh
-  https://github.com/subham07-t/connectopia-social-media-app.git
-```
-
-Go to the project directory
-
-```sh
-  cd connectopia-social-media-app
-```
-
-Install dependencies
-
-```sh
-  npm install
-```
-
-Setup .env file
-
-```sh
-  DATABASE_URL=
-  NEXTAUTH_SECRET=
-  GITHUB_ID=
-  GITHUB_SECRET=
-  GOOGLE_CLIENT_ID=
-  GOOGLE_CLIENT_SECRET=
-  NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=
-  PUSHER_APP_ID=
-  NEXT_PUBLIC_PUSHER_KEY=
-  PUSHER_SECRET=
-```
-
-Setup Prisma
-
-```sh
-  npx prisma db push
-```
-
-Start the server
-
-```sh
-  npm run dev
-```
-
-
-## Tech Stack
-
-- **Framework:** [﻿Next.js](https://nextjs.org/)
-- **Styling:** [﻿Tailwind CSS](https://tailwindcss.com/)
-- **State Management:** [zustand](https://zustand-demo.pmnd.rs/)
-- **Form Handle:** [﻿React Hook Form](https://react-hook-form.com/) 
-- **File Uploads:** [Cloudinary](https://cloudinary.com/)
-- **ORM:** [Prisma](https://www.prisma.io/)
-- **Database:** [MongoDB](https://www.mongodb.com/)
+**Live demo:** https://connectopia-social-media-app.vercel.app/
 
 ## Features
 
-- [x] Authentication with NextAuth , enhancing security with Google and GitHub OAuth authentication layers.
-- [x] Implementing real-time data update for instant messaging using **Pusher**.
-- [x] Enable users to chat individually or in groups effectively, while keeping track of their online status and message read receipts for better communication.
-- [x] Effortlessly handle file uploads using **Cloudinary** CDN, and easily share attachments within messages.
-- [x] Deliver comprehensive user profiles and chat room management for an exceptional chat experience.
-  
+- Authentication via credentials, Google, and GitHub (NextAuth.js)
+- Real-time messaging, typing status, and delivery updates (Pusher)
+- One-on-one and group conversations
+- Online presence tracking and read receipts
+- Image and file attachments (Cloudinary)
+- User profile and conversation management
+
+## Tech Stack
+
+| Layer          | Technology                                  |
+| -------------- | -------------------------------------------- |
+| Framework      | [Next.js](https://nextjs.org/) (App Router) |
+| Language       | TypeScript                                   |
+| Styling        | [Tailwind CSS](https://tailwindcss.com/)     |
+| State          | [Zustand](https://zustand-demo.pmnd.rs/)     |
+| Forms          | [React Hook Form](https://react-hook-form.com/) |
+| Auth           | [NextAuth.js](https://next-auth.js.org/)     |
+| Database       | [MongoDB](https://www.mongodb.com/)          |
+| ORM            | [Prisma](https://www.prisma.io/)             |
+| Real-time      | [Pusher](https://pusher.com/)                |
+| Media storage  | [Cloudinary](https://cloudinary.com/)        |
+
+## Architecture
+
+```mermaid
+flowchart TD
+    subgraph Client["Browser"]
+        UI["Next.js UI\n(React + Tailwind)"]
+        Store["Zustand Store"]
+    end
+
+    subgraph Server["Next.js Server"]
+        MW["Middleware\n(route protection)"]
+        API["API Routes\n(REST + Server Actions)"]
+        Auth["NextAuth.js"]
+    end
+
+    subgraph Data["Data Layer"]
+        Prisma["Prisma ORM"]
+        Mongo[("MongoDB")]
+    end
+
+    subgraph External["External Services"]
+        OAuth["Google / GitHub OAuth"]
+        PusherSvc[["Pusher Channels"]]
+        Cloud[("Cloudinary")]
+    end
+
+    UI -->|HTTP| MW --> API
+    UI <-->|WebSocket events| PusherSvc
+    API --> Auth --> OAuth
+    API --> Prisma --> Mongo
+    API -->|trigger events| PusherSvc
+    UI -->|upload| Cloud
+```
+
+Client components call REST endpoints and server actions under `app/api` and `app/actions`. Auth is handled by NextAuth with credentials and OAuth providers, backed by the Prisma adapter. Messages and conversation state are persisted in MongoDB via Prisma, while Pusher broadcasts events (new messages, presence, read receipts) to subscribed clients. Media uploads go directly to Cloudinary from the client.
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18.18+ (or 20.9+ / 22.11+)
+- A MongoDB connection string
+- Pusher, Cloudinary, and OAuth (Google/GitHub) credentials
+
+### Setup
+
+```sh
+git clone https://github.com/isSubham/connectopia-social-media-app.git
+cd connectopia-social-media-app
+npm install
+```
+
+Create a `.env` file in the project root:
+
+```env
+DATABASE_URL=
+NEXTAUTH_SECRET=
+GITHUB_ID=
+GITHUB_SECRET=
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=
+PUSHER_APP_ID=
+NEXT_PUBLIC_PUSHER_KEY=
+PUSHER_SECRET=
+```
+
+Push the Prisma schema to your database:
+
+```sh
+npx prisma db push
+```
+
+Start the development server:
+
+```sh
+npm run dev
+```
+
+## Project Structure
+
+```
+app/
+├── (root)/          Landing / auth page
+├── actions/          Server actions (data fetching)
+├── api/               REST API routes (auth, conversations, messages, register, settings)
+├── components/        Shared UI components
+├── context/           React context providers
+├── conversations/     Conversation list and chat views
+├── hooks/             Custom React hooks
+├── lib/               Prisma and Pusher clients
+├── types/             Shared TypeScript types
+└── users/             User directory
+prisma/
+└── schema.prisma      Database schema
+```
+
 ## Author
 
-👤 **Subham haldar**
+**Subham Haldar**
 
-* Github: [@Subham07-t](https://github.com/Subham07-t   )
-* LinkedIn: https://linkedin.com/in/subham-haldar
-
+- GitHub: [@isSubham](https://github.com/issubham)
+- LinkedIn: [isSubham](https://www.linkedin.com/in/issubham/)

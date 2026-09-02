@@ -64,6 +64,15 @@ flowchart TD
     UI -->|upload| Cloud
 ```
 
+<details>
+<summary>Hand-drawn version</summary>
+
+![Architecture diagram](docs/architecture-diagram.png)
+
+Editable source: [docs/architecture.excalidraw](docs/architecture.excalidraw) (open at [excalidraw.com](https://excalidraw.com)).
+
+</details>
+
 Client components call REST endpoints and server actions under `app/api` and `app/actions`. Auth is handled by NextAuth with credentials and OAuth providers, backed by the Prisma adapter. Messages and conversation state are persisted in MongoDB via Prisma, while Pusher broadcasts events (new messages, presence, read receipts) to subscribed clients. Media uploads go directly to Cloudinary from the client.
 
 ## Getting Started
